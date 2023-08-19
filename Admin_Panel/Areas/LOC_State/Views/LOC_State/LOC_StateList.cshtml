@@ -1,0 +1,78 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using System.Data
+@model DataTable
+
+
+<br />
+<h2 style="justify-content:center ">State List</h2>
+<br />
+<br />
+
+<a class="btn btn-success" asp-area="LOC_State" asp-controller="LOC_State" asp-action="LOC_StateAdd">Add New</a>
+<div class="search-field col-xl-4 ms-lg-auto d-flex">
+    <div class="me-3">
+
+        <form class="d-flex" method="get" asp-area="LOC_State" asp-controller="LOC_State" asp-action="LOC_StateSearchByName">
+            <input class="form-control me-3" type="search" placeholder="Search" aria-label="Search" runat="server" name="StateName" />
+            <div><button type="submit" class="btn btn-outline-success" value="Search" runat="server">Search</button></div>
+        </form>
+    </div>
+</div>
+   
+<br>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">StateID</th>
+            <th scope="col">StateName</th>
+            <th scope="col">StateCode</th>
+            <th scope="col">CountryName</th>
+            <th scope="col">Created</th>
+            <th scope="col">Modified</th>
+            <th colspan="2">Actions</th>
+
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (DataRow dr in Model.Rows)
+        {
+            <tr>
+                <td>@dr["StateID"]</td>
+                <td>@dr["StateName"]</td>
+                <td>@dr["StateCode"]</td>
+                <td>@dr["CountryName"]</td>
+                <td>@Convert.ToDateTime(dr["Created"]).ToString("dd-MM-yyyy")</td>
+                <td>@Convert.ToDateTime(dr["Modified"]).ToString("dd-MM-yyyy")</td>
+             
+                   @* <form>
+                        <button type="submit" class="btn btn-primary">Update</button>
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </form>*@
+
+
+                <td>
+                    <form method="post" asp-area="LOC_State" asp-controller="LOC_State" asp-action="Delete">
+                        <input type="hidden" value="@Convert.ToInt32(dr["StateID"])" name="StateID">
+                        <button type="submit" class="btn btn-danger" value="Delete">Delete</button>
+                    </form>
+                </td>
+                <td>
+                    <form method="post" asp-area="LOC_State" asp-controller="LOC_State" asp-action="LOC_StateAdd">
+                        <input type="hidden" value="@Convert.ToInt32(dr["StateID"])" name="StateID">
+                        <button type="submit" class="btn btn-primary" value="Edit">Update</button>
+                    </form>
+                </td>
+               
+            </tr>
+        }
+    </tbody>
+</table>
+
+
