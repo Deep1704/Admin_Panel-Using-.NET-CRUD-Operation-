@@ -21,4 +21,18 @@ namespace Admin_Panel.Areas.LOC_City.Models
         [Required]
         public int CountryID { get; set; }
     }
+
+    public class LOC_CityFilterModel
+    {
+        public int? CountryID { get; set; }
+        public int? StateID { get; set; }
+        public string? CityName { get; set; }
+        public string? CityCode { get; set; }
+    }
+
+    public class LOC_CityDropDownModel
+    {
+        public int CityID { get; set; }
+        public string CityName { get; set; }
+    }
 }

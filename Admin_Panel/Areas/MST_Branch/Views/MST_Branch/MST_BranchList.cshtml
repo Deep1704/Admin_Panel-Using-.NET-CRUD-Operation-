@@ -1,0 +1,110 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    LOC_BranchFilterModel filterModel = new LOC_BranchFilterModel();
+}
+
+
+@using System.Data
+@using Admin_Panel.Areas.MST_Branch.Models;
+@model DataTable
+
+
+<br />
+<h2 style="justify-content:center ">Branch List</h2>
+<br />
+
+
+<div class="container-fluid border border-dark p-4">
+    <form class="row">
+        <div><h3>Filter</h3></div>
+
+        <div asp-validation-summary="All" class="text-danger"></div>
+        <div class="col-6">
+            <lable class="form-label">Select BranchName</lable>
+            <span>
+                <input type="text" placeholder="Select BranchName" asp-for="@filterModel.BranchName" class="form-control mt-2" id="inputAddress">
+            </span>
+        </div>
+        <div class="col-6">
+            <lable class="form-label">Select BranchCode</lable>
+            <span>
+                <input type="text" placeholder="Select BranchCode" asp-for="@filterModel.BranchCode" class="form-control mt-2" id="inputAddress">
+            </span>
+        </div>
+        <div class="col-1 my-3 me-3">
+            <button type="submit" class="btn btn-primary" asp-area="MST_Branch" asp-controller="MST_Branch" asp-action="LOC_BranchFilter">
+                Search
+            </button>
+        </div>
+        <div class="col-10 my-3">
+            <form>
+                <button type="submit" class="btn btn-danger" runat="server" OnClientClick="this.form.reset();return false;">clear</button>
+            </form>
+        </div>
+    </form>
+</div>
+
+<br />
+<br />
+
+<a class="btn btn-success" asp-area="MST_Branch" asp-controller="MST_Branch" asp-action="MST_BranchAdd">Add New</a>
+@* <div class="search-field col-xl-4 ms-lg-auto d-flex">
+    <div class="me-3">
+
+        <form class="d-flex" method="get" asp-area="LOC_State" asp-controller="LOC_State" asp-action="LOC_StateSearchByName">
+            <input class="form-control me-3" type="search" placeholder="Search" aria-label="Search" runat="server" name="StateName" />
+            <div><button type="submit" class="btn btn-outline-success" value="Search" runat="server">Search</button></div>
+        </form>
+    </div>
+</div> *@
+
+<br>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">BranchID</th>
+            <th scope="col">BranchName</th>
+            <th scope="col">BranchCode</th>
+            <th scope="col">Created</th>
+            <th scope="col">Modified</th>
+            <th colspan="2">Actions</th>
+
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (DataRow dr in Model.Rows)
+        {
+            <tr>
+                <td>@dr["BranchID"]</td>
+                <td>@dr["BranchName"]</td>
+                <td>@dr["BranchCode"]</td>
+                <td>@Convert.ToDateTime(dr["Created"]).ToString("dd-MM-yyyy")</td>
+                <td>@Convert.ToDateTime(dr["Modified"]).ToString("dd-MM-yyyy")</td>
+
+
+                <td>
+                    <form method="post" asp-area="MST_Branch" asp-controller="MST_Branch" asp-action="Delete">
+                        <input type="hidden" value="@Convert.ToInt32(dr["BranchID"])" name="BranchID">
+                        <button type="submit" class="btn btn-danger" value="Delete">Delete</button>
+                    </form>
+                </td>
+                <td>
+                    <form method="post" asp-area="MST_Branch" asp-controller="MST_Branch" asp-action="MST_BranchAdd">
+                        <input type="hidden" value="@Convert.ToInt32(dr["BranchID"])" name="BranchID">
+                        <button type="submit" class="btn btn-primary" value="Edit">Update</button>
+                    </form>
+                </td>
+
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+
+
+

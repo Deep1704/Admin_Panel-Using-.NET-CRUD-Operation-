@@ -59,7 +59,7 @@
         <div class="form-group mb-3 row">
             <label class="col-sm-2 control-label col-form-label">State Name</label>
             <div class="col-xl-4">
-                <select class="form-control" asp-for="StateID" id="StateID">
+                <select class="form-control" asp-items="@(new SelectList(ViewBag.StateList,"StateID","StateName"))" asp-for="StateID" >
                     <option value="">Select State</option>
                 </select>
                 <span asp-validation-for="StateID" class="text-danger"></span>

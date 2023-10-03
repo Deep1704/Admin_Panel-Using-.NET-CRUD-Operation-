@@ -5,6 +5,7 @@ using Admin_Panel.Areas.LOC_City.Models;
 using Admin_Panel.Areas.LOC_Country.Models;
 using Admin_Panel.Areas.LOC_State.Models;
 using System.Collections.Generic;
+using MessagePack.Formatters;
 
 namespace Admin_Panel.Areas.LOC_City.Controllers
 {
@@ -13,7 +14,6 @@ namespace Admin_Panel.Areas.LOC_City.Controllers
     public class LOC_CityController : Controller
     {
         public IConfiguration Configuration;
-       
 
 
         public LOC_CityController(IConfiguration _configuration)
@@ -38,15 +38,67 @@ namespace Admin_Panel.Areas.LOC_City.Controllers
             objCmd.CommandText = "PR_City_SelectAll";
             SqlDataReader objSDR = objCmd.ExecuteReader();
             dt.Load(objSDR);
+
+            #region Country DropDown
+
+            SqlConnection connection1 = new SqlConnection(connectionstr);
+            connection1.Open();
+            SqlCommand objCmd1 = connection1.CreateCommand();
+            objCmd1.CommandType = CommandType.StoredProcedure;
+            objCmd1.CommandText = "PR_Country_SelectByCombobox";
+            SqlDataReader reader1 = objCmd1.ExecuteReader();
+            DataTable dt1 = new DataTable();
+            dt1.Load(reader1);
+            connection1.Close();
+
+            List<LOC_CountryModel> list = new List<LOC_CountryModel>();
+
+            foreach (DataRow dr in dt1.Rows)
+            {
+                LOC_CountryModel countryModel = new LOC_CountryModel();
+                countryModel.CountryID = Convert.ToInt32(dr["CountryID"]);
+                countryModel.CountryName = dr["CountryName"].ToString();
+                list.Add(countryModel);
+            }
+            ViewBag.CountryList = list;
+
+            #endregion
+
+            #region State DropDown
+
+            SqlConnection connection2 = new SqlConnection(connectionstr);
+            connection2.Open();
+            SqlCommand objCmd2 = connection2.CreateCommand();
+            objCmd2.CommandType = CommandType.StoredProcedure;
+            objCmd2.CommandText = "PR_State_ComboBox";
+            SqlDataReader reader2 = objCmd2.ExecuteReader();
+            DataTable dt2 = new DataTable();
+            dt2.Load(reader2);
+            connection2.Close();
+
+            List<LOC_StateDropDownModel> list2 = new List<LOC_StateDropDownModel>();
+
+            foreach (DataRow dr in dt2.Rows)
+            {
+                LOC_StateDropDownModel stateModel = new LOC_StateDropDownModel();
+                stateModel.StateID = Convert.ToInt32(dr["StateID"]);
+                stateModel.StateName = dr["StateName"].ToString();
+                list2.Add(stateModel);
+            }
+            ViewBag.StateList = list2;
+
+            #endregion
+
             return View("LOC_CityList", dt);
 
             #endregion
+
 
         }
         public IActionResult LOC_CityAdd(int? CityID)
         {
 
-            string connectionstr = this.Configuration.GetConnectionString("myconnectionstring"); 
+            string connectionstr = this.Configuration.GetConnectionString("myconnectionstring");
 
             #region Country DropDown
             SqlConnection connection = new SqlConnection(connectionstr);
@@ -70,12 +122,14 @@ namespace Admin_Panel.Areas.LOC_City.Controllers
             }
             ViewBag.CountryList = list;
 
-            List<LOC_StateDropDownModel> list1 = new List<LOC_StateDropDownModel>();
-            ViewBag.StateList = list1;
+
             #endregion
 
 
-            #region SelectByPK
+            #region State DropDown
+
+            List<LOC_StateDropDownModel> list1 = new List<LOC_StateDropDownModel>();
+            ViewBag.StateList = list1;
 
             if (CityID != null)
             {
@@ -90,22 +144,49 @@ namespace Admin_Panel.Areas.LOC_City.Controllers
                 DataTable dt2 = new DataTable();
                 SqlDataReader objSDR2 = objCmd2.ExecuteReader();
                 dt2.Load(objSDR2);
-          
-                LOC_CityModel modelLOC_City = new LOC_CityModel();
 
-                foreach (DataRow dr in dt2.Rows)
+                if (dt2.Rows.Count > 0)
                 {
 
-                    modelLOC_City.CityID = Convert.ToInt32(dr["CityID"]);
-                    modelLOC_City.StateID = Convert.ToInt32(dr["StateID"]);
-                    modelLOC_City.CountryID = Convert.ToInt32(dr["CountryID"]);
-                    modelLOC_City.CityName = dr["CityName"].ToString();
-                    modelLOC_City.CityCode = dr["CityCode"].ToString();
-                    modelLOC_City.CountryName = dr["CountryName"].ToString();
-                    modelLOC_City.StateName = dr["StateName"].ToString();
+                    LOC_CityModel modelLOC_City = new LOC_CityModel();
+
+                    foreach (DataRow dr in dt2.Rows)
+                    {
+
+                        modelLOC_City.CityID = Convert.ToInt32(dr["CityID"]);
+                        modelLOC_City.StateID = Convert.ToInt32(dr["StateID"]);
+                        modelLOC_City.CountryID = Convert.ToInt32(dr["CountryID"]);
+                        modelLOC_City.CityName = dr["CityName"].ToString();
+                        modelLOC_City.CityCode = dr["CityCode"].ToString();
+                        modelLOC_City.CountryName = dr["CountryName"].ToString();
+                        modelLOC_City.StateName = dr["StateName"].ToString();
+                    }
+
+                    SqlConnection connection1 = new SqlConnection(connectionstr);
+                    connection1.Open();
+
+                    SqlCommand objCmd1 = connection1.CreateCommand();
+                    objCmd1.CommandType = CommandType.StoredProcedure;
+                    objCmd1.CommandText = "PR_State_SelectComboBoxByCountryID";
+                    objCmd1.Parameters.AddWithValue("@CountryID", modelLOC_City.CountryID);
+                    DataTable dt1 = new DataTable();
+                    SqlDataReader objSDR1 = objCmd1.ExecuteReader();
+                    dt1.Load(objSDR1);
+
+                    List<LOC_StateDropDownModel> list2 = new List<LOC_StateDropDownModel>();
+                    foreach (DataRow dr in dt1.Rows)
+                    {
+                        LOC_StateDropDownModel stateModel = new LOC_StateDropDownModel();
+                        stateModel.StateID = Convert.ToInt32(dr["StateID"]);
+                        stateModel.StateName = dr["StateName"].ToString();
+                        list2.Add(stateModel);
+
+                    }
+                    ViewBag.StateList = list2;
+
+                    return View("LOC_CityAdd", modelLOC_City);
                 }
-              
-                return View("LOC_CityAdd", modelLOC_City);
+                return View("LOC_CityAdd");
             }
             else
             {
@@ -131,20 +212,20 @@ namespace Admin_Panel.Areas.LOC_City.Controllers
             SqlDataReader objSDR1 = objCmd1.ExecuteReader();
             dt1.Load(objSDR1);
 
-            List<LOC_StateDropDownModel> list1 = new List<LOC_StateDropDownModel>();
+            List<LOC_StateDropDownModel> list3 = new List<LOC_StateDropDownModel>();
             foreach (DataRow dr in dt1.Rows)
             {
                 LOC_StateDropDownModel stateModel = new LOC_StateDropDownModel();
                 stateModel.StateID = Convert.ToInt32(dr["StateID"]);
                 stateModel.StateName = dr["StateName"].ToString();
-                list1.Add(stateModel);
+                list3.Add(stateModel);
 
             }
-            Console.WriteLine(list1.Count());
-            var vModel = list1;
+            Console.WriteLine(list3.Count());
+            var vModel = list3;
             return Json(vModel);
 
-           
+
             #endregion
         }
 
@@ -207,23 +288,77 @@ namespace Admin_Panel.Areas.LOC_City.Controllers
         }
         #endregion
 
-        #region City Search By Name
-
-        public IActionResult LOC_CitySearchByName(string CityName)
+        #region Filter
+        public IActionResult LOC_CityFilter(LOC_CityFilterModel FilterModel)
         {
             string connectionStr = this.Configuration.GetConnectionString("myConnectionString");
+
+            #region Country DropDown
+
+            SqlConnection connection1 = new SqlConnection(connectionStr);
+            connection1.Open();
+            SqlCommand objCmd1 = connection1.CreateCommand();
+            objCmd1.CommandType = CommandType.StoredProcedure;
+            objCmd1.CommandText = "PR_Country_SelectByCombobox";
+            SqlDataReader reader1 = objCmd1.ExecuteReader();
+            DataTable dt1 = new DataTable();
+            dt1.Load(reader1);
+            connection1.Close();
+
+            List<LOC_CountryModel> list = new List<LOC_CountryModel>();
+
+            foreach (DataRow dr in dt1.Rows)
+            {
+                LOC_CountryModel countryModel = new LOC_CountryModel();
+                countryModel.CountryID = Convert.ToInt32(dr["CountryID"]);
+                countryModel.CountryName = dr["CountryName"].ToString();
+                list.Add(countryModel);
+            }
+            ViewBag.CountryList = list;
+
+            #endregion
+
+            #region State DropDown
+
+            SqlConnection connection2 = new SqlConnection(connectionStr);
+            connection2.Open();
+            SqlCommand objCmd2 = connection2.CreateCommand();
+            objCmd2.CommandType = CommandType.StoredProcedure;
+            objCmd2.CommandText = "PR_State_ComboBox";
+            SqlDataReader reader2 = objCmd2.ExecuteReader();
+            DataTable dt2 = new DataTable();
+            dt2.Load(reader2);
+            connection2.Close();
+
+            List<LOC_StateDropDownModel> list2 = new List<LOC_StateDropDownModel>();
+
+            foreach (DataRow dr in dt2.Rows)
+            {
+                LOC_StateDropDownModel stateModel = new LOC_StateDropDownModel();
+                stateModel.StateID = Convert.ToInt32(dr["StateID"]);
+                stateModel.StateName = dr["StateName"].ToString();
+                list2.Add(stateModel);
+            }
+            ViewBag.StateList = list2;
+
+            #endregion
+
             DataTable dt = new DataTable();
             SqlConnection connection = new SqlConnection(connectionStr);
             connection.Open();
             SqlCommand objCmd = connection.CreateCommand();
             objCmd.CommandType = CommandType.StoredProcedure;
-            objCmd.CommandText = "PR_City_SelectByCityName";
-            objCmd.Parameters.AddWithValue("@CName", CityName);
+            objCmd.CommandText = "PR_City_Filter";
+            objCmd.Parameters.AddWithValue("@CountryID", FilterModel.CountryID);
+            objCmd.Parameters.AddWithValue("@StateID", FilterModel.StateID);
+            objCmd.Parameters.AddWithValue("@CityName", FilterModel.CityName);
+            objCmd.Parameters.AddWithValue("@CityCode", FilterModel.CityCode);
             SqlDataReader objSDR = objCmd.ExecuteReader();
             dt.Load(objSDR);
+
+            ModelState.Clear();
             return View("LOC_CityList", dt);
         }
-
         #endregion
 
     }

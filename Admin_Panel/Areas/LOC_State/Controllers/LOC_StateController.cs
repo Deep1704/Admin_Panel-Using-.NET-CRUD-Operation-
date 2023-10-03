@@ -4,6 +4,7 @@ using System.Data;
 using Admin_Panel.Areas.LOC_State.Models;
 using Admin_Panel.Areas.LOC_Country.Models;
 
+
 namespace Admin_Panel.Areas.LOC_State.Controllers
 {
 
@@ -35,6 +36,30 @@ namespace Admin_Panel.Areas.LOC_State.Controllers
             objCmd.CommandText = "PR_State_SelectAll";
             SqlDataReader objSDR = objCmd.ExecuteReader();
             dt.Load(objSDR);
+
+
+
+            SqlConnection connection1 = new SqlConnection(connectionstr);
+            connection1.Open();
+
+            SqlCommand objCmd1 = connection1.CreateCommand();
+            objCmd1.CommandType = CommandType.StoredProcedure;
+            objCmd1.CommandText = "PR_Country_SelectByCombobox";
+            DataTable dt1 = new DataTable();
+            SqlDataReader objSDR1 = objCmd1.ExecuteReader();
+            dt1.Load(objSDR1);
+
+            List<LOC_CountryDropDownModel> list = new List<LOC_CountryDropDownModel>();
+            foreach (DataRow dr in dt1.Rows)
+            {
+                LOC_CountryDropDownModel countryModel = new LOC_CountryDropDownModel();
+                countryModel.CountryID = Convert.ToInt32(dr["CountryID"]);
+                countryModel.CountryName = dr["CountryName"].ToString();
+                list.Add(countryModel);
+
+            }
+            ViewBag.CountryList = list;
+
             return View("LOC_StateList", dt);
 
             #endregion
@@ -160,20 +185,57 @@ namespace Admin_Panel.Areas.LOC_State.Controllers
         }
         #endregion
 
-        #region State Search By Name
 
-        public IActionResult LOC_StateSearchByName(string StateName)
+        #region Filter
+
+        public IActionResult LOC_StateFilter(LOC_StateFilterModel filterModel)
         {
-            string connectionStr = this.Configuration.GetConnectionString("myConnectionString");
+            string connectionStr = this.Configuration.GetConnectionString("myconnectionString");
             DataTable dt = new DataTable();
             SqlConnection connection = new SqlConnection(connectionStr);
             connection.Open();
             SqlCommand objCmd = connection.CreateCommand();
             objCmd.CommandType = CommandType.StoredProcedure;
-            objCmd.CommandText = "PR_State_SelectByStateName";
-            objCmd.Parameters.AddWithValue("@SName", StateName);
+            objCmd.CommandText = "PR_State_Filter";
+            objCmd.Parameters.AddWithValue("@CountryID", filterModel.CountryID);
+            objCmd.Parameters.AddWithValue("@StateName", filterModel.StateName);
+            objCmd.Parameters.AddWithValue("@StateCode", filterModel.StateCode);
             SqlDataReader objSDR = objCmd.ExecuteReader();
             dt.Load(objSDR);
+            Console.WriteLine(filterModel.CountryID + " " + "hello");
+            Console.WriteLine(filterModel.StateName + " " + filterModel.StateCode);
+            foreach (DataRow dr in dt.Rows)
+            {
+                Console.WriteLine(dr["CountryName"]);
+                Console.WriteLine(dr["StateName"]);
+                Console.WriteLine(dr["StateCode"]);
+            }
+            ModelState.Clear();
+
+            #region Country DropDown
+
+            SqlConnection connection1 = new SqlConnection(connectionStr);
+            connection1.Open();
+
+            SqlCommand objCmd1 = connection1.CreateCommand();
+            objCmd1.CommandType = CommandType.StoredProcedure;
+            objCmd1.CommandText = "PR_Country_SelectByCombobox";
+            DataTable dt1 = new DataTable();
+            SqlDataReader objSDR1 = objCmd1.ExecuteReader();
+            dt1.Load(objSDR1);
+
+            List<LOC_CountryDropDownModel> list = new List<LOC_CountryDropDownModel>();
+            foreach (DataRow dr in dt1.Rows)
+            {
+                LOC_CountryDropDownModel countryModel = new LOC_CountryDropDownModel();
+                countryModel.CountryID = Convert.ToInt32(dr["CountryID"]);
+                countryModel.CountryName = dr["CountryName"].ToString();
+                list.Add(countryModel);
+
+            }
+            ViewBag.CountryList = list;
+
+            #endregion
             return View("LOC_StateList", dt);
         }
 

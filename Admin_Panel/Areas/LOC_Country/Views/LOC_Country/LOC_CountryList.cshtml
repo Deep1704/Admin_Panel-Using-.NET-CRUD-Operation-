@@ -3,85 +3,52 @@
 *@
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
+    LOC_CountryFilterModel filterModel = new LOC_CountryFilterModel();
 }
-@*<div class="body">
-    <div class="d-flex mt-3 mb-3">
-        <h3>Country List</h3>
-    </div>
-    <div class="table-header d-flex" border="1">
-        <div class="add-button mr-auto">
-            <form method="post">
-            <input type="submit" class="btn btn-success" asp-area="LOC_Country" value="Add New" asp-controller="LOC_CountryController" asp-action="LOC_CountryAdd"></input>
-            </form>
-        </div>
-        <div class="search-field col-xl-4 ms-lg-auto">
-            <form class="d-flex">
-                <input class="form-control me-3" type="search" placeholder="Search" aria-label="Search">
-                <button class="btn btn-outline-success" type="submit">Search</button>
-            </form>
-        </div>
-    </div>
-    <table class="table mt-3">
-        <thead>
-            <tr>
-                <th scope="col">CountryID</th>
-                <th scope="col">CountryName</th>
-                <th scope="col">CountryCode</th>
-                <th scope="col">Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <th scope="row">1</th>
-                <td>India</td>
-                <td>IND</td>
-                <td>
-                    <button type="button" class="btn btn-danger">Delete</button>
-                    <button type="button" class="btn btn-info">Update</button>
-                </td>
-            </tr>
-            <tr>
-                <th scope="row">2</th>
-                <td>Pakistan</td>
-                <td>PAK</td>
-                <td>
-                    <button type="button" class="btn btn-danger">Delete</button>
-                    <button type="button" class="btn btn-info">Update</button>
-                </td>
-            </tr>
-            <tr>
-                <th scope="row">3</th>
-                <td>Australia</td>
-                <td>AUS</td>
-                <td>
-                    <button type="button" class="btn btn-danger">Delete</button>
-                    <button type="button" class="btn btn-info">Update</button>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-</div>
+
+@*
+
 *@
 
 @using System.Data
 @model DataTable
-
+@using Admin_Panel.Areas.LOC_Country.Models;
 
 <br />
 <h2 style="justify-content:center ">Country List</h2>
 <br />
+
+<div class="container-fluid border border-dark p-4">
+    <form class="row">
+        <div><h3>Filter</h3></div>
+
+        <div asp-validation-summary="All" class="text-danger"></div>
+        <div class="col-6">
+            <lable class="form-label">Select CountryName</lable>
+            <input type="text" placeholder="Select CountryName" asp-for="@filterModel.CountryName" class="form-control mt-2" id="inputAddress">
+        </div>
+        <div class="col-6">
+            <lable class="form-label">Select CountryCode</lable>
+            <input type="text" placeholder="Select CountryCode" asp-for="@filterModel.CountryCode" class="form-control mt-2" id="inputAddress">
+        </div>
+        <div class="col-1 my-3 me-3">
+            <button type="submit" class="btn btn-primary" asp-area="LOC_Country" asp-controller="LOC_Country" asp-action="LOC_CountryFilter">
+                Search
+            </button>
+        </div>
+
+        <div class="col-10 my-3">
+            <form>
+                <button type="submit" class="btn btn-danger" runat="server" OnClientClick="this.form.reset();return false;">clear</button>
+            </form>
+        </div>
+    </form>
+</div>
+<br />
 <br />
 
 <a class="btn btn-success" asp-area="LOC_Country" asp-controller="LOC_Country" asp-action="LOC_CountryAdd">Add New</a>
-<div class="search-field col-xl-4 ms-lg-auto d-flex">
-    <div class="me-3">
 
-        <form class="d-flex" method="get" asp-area="LOC_Country" asp-controller="LOC_Country" asp-action="LOC_CountrySearchByName">
-            <input class="form-control me-3" type="search" placeholder="Search" aria-label="Search" runat="server" name="CountryName" />
-            <div><input type="submit" class="btn btn-outline-success" value="Search" runat="server"/></div>
-        </form>
-    </div>
-</div>
 <br>
 
 <table class="table">
@@ -105,15 +72,15 @@
                 <td>@dr["CountryCode"]</td>
                 <td>@Convert.ToDateTime(dr["Created"]).ToString("dd-MM-yyyy")</td>
                 <td>@Convert.ToDateTime(dr["Modified"]).ToString("dd-MM-yyyy")</td>
-           
-                   @* @*<form method="post" asp-controller="LOC_Country" , asp-action="Delete">
-                        <input type="hidden" name="CountryID" value="@int.Parse(@dr["CountryID"].ToString())">
-                        <input type="submit" value="Delete" class="btn btn-danger" />
-                    </form>*@
-                   @* <form method="post" >
-                        <button type="submit" class="btn btn-primary" asp-area="LOC_Country" asp-controller="LOC_Country" asp-action="LOC_CountryAdd">Update</button>
-                        <button type="submit" class="btn btn-danger" asp-area="LOC_Country" asp-controller="LOC_Country" asp-action="Delete" value="@Convert.ToInt32(dr["CountryID"].ToString())">Delete</button>
-                    </form>*@
+
+                @* @*<form method="post" asp-controller="LOC_Country" , asp-action="Delete">
+            <input type="hidden" name="CountryID" value="@int.Parse(@dr["CountryID"].ToString())">
+            <input type="submit" value="Delete" class="btn btn-danger" />
+            </form>*@
+                @* <form method="post" >
+            <button type="submit" class="btn btn-primary" asp-area="LOC_Country" asp-controller="LOC_Country" asp-action="LOC_CountryAdd">Update</button>
+            <button type="submit" class="btn btn-danger" asp-area="LOC_Country" asp-controller="LOC_Country" asp-action="Delete" value="@Convert.ToInt32(dr["CountryID"].ToString())">Delete</button>
+            </form>*@
 
                 <td>
                     <form method="post" asp-area="LOC_Country" asp-controller="LOC_Country" asp-action="Delete">
@@ -127,13 +94,13 @@
                         <button type="submit" class="btn btn-primary" value="Edit">Update</button>
                     </form>
                 </td>
-              @*  <td>
-                    <form method="post" asp-area="LOC_Country" asp-controller="LOC_Country" asp-action="LOC_CountryAdd">
-                        <input type="hidden" value="@Convert.ToInt32(dr["CountryID"])" name="CountryID">
-                        <button type="submit" class="btn btn-primary" value="Edit">Update</button>
-                    </form>
-                </td>*@
-              
+                @*  <td>
+            <form method="post" asp-area="LOC_Country" asp-controller="LOC_Country" asp-action="LOC_CountryAdd">
+            <input type="hidden" value="@Convert.ToInt32(dr["CountryID"])" name="CountryID">
+            <button type="submit" class="btn btn-primary" value="Edit">Update</button>
+            </form>
+            </td>*@
+
             </tr>
         }
     </tbody>

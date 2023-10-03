@@ -130,23 +130,23 @@ namespace Admin_Panel.Areas.LOC_Country.Controllers
         }
         #endregion
 
-        #region Country Search By Name
+        #region Filter
 
-        public IActionResult LOC_CountrySearchByName(string? CountryName)
+        public IActionResult LOC_CountryFilter(LOC_CountryFilterModel filterModel)
         {
-              string connectionStr = this.Configuration.GetConnectionString("myConnectionString");
-                DataTable dt = new DataTable();
-                SqlConnection connection = new SqlConnection(connectionStr);
-                connection.Open();
-                SqlCommand objCmd = connection.CreateCommand();
-                objCmd.CommandType = CommandType.StoredProcedure;
-                objCmd.CommandText = "PR_Country_SelectByCountryName";
-                objCmd.Parameters.AddWithValue("@CountryName", CountryName);
-                Console.WriteLine(CountryName);
-                SqlDataReader objSDR = objCmd.ExecuteReader();
-                dt.Load(objSDR);
-                return View("LOC_CountryList", dt);
-          
+            string connectionStr = this.Configuration.GetConnectionString("myconnectionString");
+            DataTable dt = new DataTable();
+            SqlConnection connection = new SqlConnection(connectionStr);
+            connection.Open();
+            SqlCommand objCmd = connection.CreateCommand();
+            objCmd.CommandType = CommandType.StoredProcedure;
+            objCmd.CommandText = "PR_Country_filter";
+            objCmd.Parameters.AddWithValue("@CountryName", filterModel.CountryName);
+            objCmd.Parameters.AddWithValue("@CountryCode", filterModel.CountryCode);
+            SqlDataReader objSDR = objCmd.ExecuteReader();
+            dt.Load(objSDR);
+            ModelState.Clear();
+            return View("LOC_CountryList", dt);
         }
 
         #endregion
